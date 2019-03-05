@@ -17,7 +17,7 @@ setup(
     version=version,
     license='GPLv3',
     description='Evaluate if a twitter account is a bot or not',
-    long_description = long_descr,
+    long_description=long_descr,
     packages=['botrnot'],
     py_modules=['botrnot'],
     keywords=['bots', 'data-analysis', 'twitter', 'osint-research', 'osint'],

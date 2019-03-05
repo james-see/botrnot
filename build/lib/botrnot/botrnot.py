@@ -10,11 +10,9 @@
 import argparse
 from twitter_scraper import get_tweets
 import json
-from bs4 import BeautifulSoup
-import requests
 
 # globals
-__version__ = "1.0.4"
+__version__ = "1.0.3"
 logo = """
 ┌───────────────────────────┐
 │      Bot R Not            |
@@ -56,30 +54,6 @@ def get_content(username):
         tweets.append(tweet)
     return tweets
 
-
-def get_user_data(username):
-    """Get user info for profile."""
-    userdata = dict()
-    r = requests.get(f'https://www.twitter.com/{username}')
-    soup = BeautifulSoup(r.text, 'html.parser')
-    following = soup.find('li', class_='ProfileNav-item--following')
-    following = following.find('span', class_='ProfileNav-value')
-    userdata['following'] = following.text
-    if args.verbose:
-        print(f"Following count: {following.text}")
-    followers = soup.find('li', class_='ProfileNav-item--followers')
-    followers = followers.find('span', class_='ProfileNav-value')
-    userdata['followers'] = followers.text
-    if args.verbose:
-        print(f"Followers count: {followers.text}")
-    twittername = soup.find('h1', class_='ProfileHeaderCard-name')
-    userdata['fullname'] = twittername.text.strip()
-    userbio = soup.find('p', class_='ProfileHeaderCard-bio')
-    userdata['userbio'] = userbio.text
-    userlocation = soup.find('div', class_='ProfileHeaderCard-location')
-    userdata['userlocation'] = userlocation.text.strip()
-    return userdata
-
 # main section
 
 
@@ -87,15 +61,12 @@ def main():
     """Main function that runs everything."""
     if args.nologo != True:
         print(logo)
-    userdatadict = get_user_data(args.username)
     tweetslist = get_content(args.username)
     if args.verbose:
         print(f"First tweet in list: {tweetslist[0]}")
     if args.jsonout:
-        with open('{}-tweets.json'.format(args.username), 'w+') as f:
-            f.write(json.dumps(tweetslist, indent=4, sort_keys=True, default=str))
-        with open('{}-profile.json'.format(args.username), 'w+') as f:
-            f.write(json.dumps(userdatadict, indent=4, sort_keys=True, default=str))
+        with open('{}-tweets.json'.format(args.username),'w+') as f:
+            f.write(json.dumps(tweetslist,indent=4, sort_keys=True, default=str))
 
 
 if __name__ == "__main__":
