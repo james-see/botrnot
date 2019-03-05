@@ -12,7 +12,7 @@ from twitter_scraper import get_tweets
 import json
 
 # globals
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 logo = """
 ┌───────────────────────────┐
 │      Bot R Not            |

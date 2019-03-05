@@ -7,6 +7,9 @@ version = re.search(
     re.M
 ).group(1)
 
+with open("README.md", "r") as f:
+    long_descr = f.read()
+
 setup(
     name='botrnot',
     author='James Campbell',
@@ -14,16 +17,18 @@ setup(
     version=version,
     license='GPLv3',
     description='Evaluate if a twitter account is a bot or not',
+    long_description = long_descr,
     packages=['botrnot'],
     py_modules=['botrnot'],
     keywords=['bots', 'data-analysis', 'twitter', 'osint-research', 'osint'],
-    classifiers=["Programming Language :: Python :: 3 :: Only"],
+    classifiers=["Programming Language :: Python :: 3 :: Only","Operating System :: OS Independent"],
     install_requires=[
         'argparse',
         'pandas',
         'pprint',
         'requests',
-        'twitter_scraper'
+        'twitter_scraper',
+        'json'
     ],
     entry_points={
         'console_scripts': [
