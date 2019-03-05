@@ -1,0 +1,2 @@
+setuptools==40.8.0
+twitter_scraper==0.3.0
