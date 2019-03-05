@@ -1,3 +1,5 @@
 *.json
 *.egg-info/
 *.egg-info
+dist/
+build/
