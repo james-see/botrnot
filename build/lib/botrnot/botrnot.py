@@ -15,7 +15,7 @@ import requests
 from beautifultable import BeautifulTable
 
 # globals
-__version__ = "1.0.8"
+__version__ = "1.0.7"
 # ANSI color terminal escape sequences
 OKBLUE = '\033[94m'
 ENDC = '\033[0m'

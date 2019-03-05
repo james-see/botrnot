@@ -24,7 +24,8 @@ setup(
     classifiers=["Programming Language :: Python :: 3 :: Only","Operating System :: OS Independent"],
     install_requires=[
         'argparse',
-        'twitter_scraper'
+        'twitter_scraper',
+        'beautifultable'
     ],
     entry_points={
         'console_scripts': [
