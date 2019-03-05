@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup
 import requests
 
 # globals
-__version__ = "1.0.4"
+__version__ = "1.0.5"
 logo = """
 ┌───────────────────────────┐
 │      Bot R Not            |
