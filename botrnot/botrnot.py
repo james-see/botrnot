@@ -8,13 +8,13 @@
 
 # imports section
 import argparse
-from twitter_scraper import get_tweets
 import json
+from twitter_scraper import get_tweets
 from bs4 import BeautifulSoup
 import requests
 
 # globals
-__version__ = "1.0.5"
+__version__ = "1.0.6"
 logo = """
 ┌───────────────────────────┐
 │      Bot R Not            |
@@ -36,14 +36,14 @@ logo = """
 """
 
 # arguments
-parser = argparse.ArgumentParser(description='collects and processes twitter data example: botrnot -u jamescampbell',
+PARSER = argparse.ArgumentParser(description='collects and processes twitter data example: botrnot -u jamescampbell',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('-u', '--user', dest='username',
+PARSER.add_argument('-u', '--user', dest='username',
                     help='username to evaluate', default='jamescampbell', required=False)
-parser.add_argument('-n', '--no-logo', dest='nologo', action='store_true', default=False, help='dont display logo (default False)')
-parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=False, help='print more things out about search')
-parser.add_argument('-j', '--json', dest='jsonout', action='store_true', default=False, help='save tweets out to json file')
-args = parser.parse_args()
+PARSER.add_argument('-n', '--no-logo', dest='nologo', action='store_true', default=False, help='dont display logo (default False)')
+PARSER.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=False, help='print more things out about search')
+PARSER.add_argument('-j', '--json', dest='jsonout', action='store_true', default=False, help='save tweets out to json file')
+args = PARSER.parse_args()
 
 
 # functions section
@@ -85,7 +85,7 @@ def get_user_data(username):
 
 def main():
     """Main function that runs everything."""
-    if args.nologo != True:
+    if args.nologo is not True:
         print(logo)
     userdatadict = get_user_data(args.username)
     tweetslist = get_content(args.username)

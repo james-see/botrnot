@@ -24,11 +24,7 @@ setup(
     classifiers=["Programming Language :: Python :: 3 :: Only","Operating System :: OS Independent"],
     install_requires=[
         'argparse',
-        'pandas',
-        'pprint',
-        'requests',
-        'twitter_scraper',
-        'json'
+        'twitter_scraper'
     ],
     entry_points={
         'console_scripts': [
