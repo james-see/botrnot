@@ -1,0 +1,3 @@
+[console_scripts]
+botrnot = botrnot.botrnot:main
+

@@ -1,0 +1,13 @@
+Metadata-Version: 1.1
+Name: botrnot
+Version: 1.0.0
+Summary: Evaluate if a twitter account is a bot or not
+Home-page: https://github.com/jamesacampbell/botrnot
+Author: James Campbell
+Author-email: james@jamescampbell.us
+License: GPLv3
+Download-URL: https://github.com/jamesacampbell/botrnot/archive/1.0.0.tar.gz
+Description: UNKNOWN
+Keywords: bots,data-analysis,twitter,osint-research,osint
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3 :: Only

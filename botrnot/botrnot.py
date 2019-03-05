@@ -11,7 +11,7 @@ import argparse
 from twitter_scraper import get_tweets
 
 # globals
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 logo = """
 ┌──────────────────────┐
 │      Bot R Not       │

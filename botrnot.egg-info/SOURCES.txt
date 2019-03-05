@@ -1,0 +1,11 @@
+README.md
+setup.py
+botrnot/__init__.py
+botrnot/__main__.py
+botrnot/botrnot.py
+botrnot.egg-info/PKG-INFO
+botrnot.egg-info/SOURCES.txt
+botrnot.egg-info/dependency_links.txt
+botrnot.egg-info/entry_points.txt
+botrnot.egg-info/requires.txt
+botrnot.egg-info/top_level.txt

@@ -1,0 +1,5 @@
+argparse
+pandas
+pprint
+requests
+twitter_scraper
