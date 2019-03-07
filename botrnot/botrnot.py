@@ -3,7 +3,7 @@
 # Author: James Campbell
 # License: Please see the license file in this repo
 # First Create Date: 28-Jan-2018
-# Last Update: 03-05-2019
+# Last Update: 03-07-2019
 # Requirements: minimal. check requirements.txt and run pip/pip3 install -f requirements.txt
 
 # imports section
@@ -14,13 +14,12 @@ import requests
 from beautifultable import BeautifulTable
 
 # globals
-__version__ = "1.1.0"
-# ANSI color terminal escape sequences
+__version__ = "1.2.0"
 OKBLUE = '\033[94m'
 ENDC = '\033[0m'
 logo = """
 ┌───────────────────────────┐
-│      Bot R Not            |
+│     Bot R Not   2019      |
 │    ____                   |
 |   /  __\          ____    |                
 |   \( oo          (___ \   |                  
@@ -42,7 +41,7 @@ logo = """
 PARSER = argparse.ArgumentParser(description='collects and processes twitter data example: botrnot -u jamescampbell',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 PARSER.add_argument('-u', '--user', dest='username',
-                    help='username to evaluate', default='jamescampbell', required=False)
+                    help='username to evaluate', default='jamescampbell', required=True)
 PARSER.add_argument('-n', '--no-logo', dest='nologo', action='store_true', default=False, help='dont display logo (default False)')
 PARSER.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=False, help='print more things out about search')
 PARSER.add_argument('-j', '--json', dest='jsonout', action='store_true', default=False, help='save tweets out to json file')
@@ -71,7 +70,9 @@ def get_user_data(username):
         userdata['followers'] = "NA"
     try:
         twittername = soup.find('h1', class_='ProfileHeaderCard-name')
-        userdata['fullname'] = twittername.text.strip()
+        userdata['fullname'] = twittername.text
+        if "Verified" in twittername.text:
+            userdata['fullname'] = twittername.text.split('Verified')[0]
     except:
         userdata['fullname'] = "NA"
     try:
@@ -94,6 +95,7 @@ def get_user_data(username):
         userdata['userbirthdate'] = userbirthdate.text.strip()
     except:
         userdata['userbirthdate'] = "NA"
+    userdata['userid'] = soup.find('div', class_="tweet")['data-user-id']
     if args.verbose:
         t = BeautifulTable()
         # t.column_headers = ['Item', 'Value']
@@ -104,6 +106,8 @@ def get_user_data(username):
         t.append_row(["User Location", OKBLUE+userdata['userlocation']+ENDC])
         t.append_row(["User Join Date", OKBLUE+userdata['userjoindate']+ENDC])
         t.append_row(["User Birth Date", OKBLUE+userdata['userbirthdate']+ENDC])
+        t.append_row(["User ID", OKBLUE+userdata['userid']+ENDC])
+        print('\nBio table')
         print(t)
     return userdata
 
@@ -125,9 +129,7 @@ def get_tweets(username=args.username):
             actualjson = jsondata.json()
             souppage = BeautifulSoup(actualjson['items_html'], 'html.parser')
             tweets = souppage.find_all('li', class_='stream-item')
-            # print(tweets[19])
             last_tweet = tweets[19]["data-item-id"]
-            # print(last_tweet)
         else:
             jsondata = requests.get(url, params={'max_position': last_tweet}, headers=headers)
             actualjson = jsondata.json()
@@ -137,21 +139,22 @@ def get_tweets(username=args.username):
         for item in tweets:
             tweetdict = dict()
             i = i + 1
-            # print(item)
             tweettext = item.find(class_='tweet-text')
             tweetdict['tweettext'] = tweettext.text
+            tweetinfo = item.find('div', class_='tweet')
+            if tweetinfo.has_attr('data-retweeter'):
+                tweetdict['type'] = 'retweet'
+            else:
+                tweetdict['type'] = 'original'
             retweets = item.find('span', class_='ProfileTweet-action--retweet')
             retweets = retweets.find('span')['data-tweet-stat-count']
-            # print(retweets)
-            tweetdict['retweets'] = retweets
+            tweetdict['rts'] = retweets
             favorites = item.find('span', class_='ProfileTweet-action--favorite')
             favorites = favorites.find('span')['data-tweet-stat-count']
-            #print(favorites)
-            tweetdict['favorites'] = favorites
+            tweetdict['favs'] = favorites
             replies = item.find('span', class_='ProfileTweet-action--reply')
             replies = replies.find('span')['data-tweet-stat-count']
             tweetdict['replies'] = replies
-            # timestamp
             tweetdict['timestamp'] = item.find(class_='_timestamp')['data-time']
             # tweetid
             tweetdict['id'] = item["data-item-id"]
@@ -164,10 +167,34 @@ def get_tweets(username=args.username):
         t = BeautifulTable()
         t.column_headers = [str(x) for x in alltweets[0].keys()]
         t.append_row([x for x in alltweets[0].values()])
-        print('Most recent tweet:\n')
+        print('Most recent tweet')
         print(t)
     return alltweets
 
+
+def get_stats(tweetslist):
+    retweets, replies, favorites, rttype = [], [], [], []
+    for item in tweetslist:
+        if item['type'] == 'retweet':
+            rttype.append(v)
+            continue
+        for k,v in item.items():
+            if k == 'replies':
+                replies.append(int(v))
+            if k == 'rts':
+                retweets.append(int(v))
+            if k == 'favs':
+                favorites.append(int(v))
+    if args.verbose:
+        t = BeautifulTable()
+        t.column_headers = ["Metric", "Amount"]
+        t.append_row([f"Total tweets collected:",f"{OKBLUE}{len(tweetslist)}{ENDC}"])
+        t.append_row([f"Total that were retweets:",f"{OKBLUE}{len(rttype)} ({round(len(rttype)/len(tweetslist)*100)}%) {ENDC}"])
+        t.append_row([f"Retweets in {len(retweets)}",f"{OKBLUE}{sum(retweets)}{ENDC}"])
+        t.append_row([f"Replies in {len(replies)}",f"{OKBLUE}{sum(replies)}{ENDC}"])
+        t.append_row([f"Favorites in {len(favorites)}",f"{OKBLUE}{sum(favorites)}{ENDC}"])
+        print("\nMetrics table")
+        print(t)
 
 # main section
 
@@ -176,13 +203,9 @@ def main():
     """Main function that runs everything."""
     if args.nologo is not True:
         print(logo)
-
     tweetslist = get_tweets(args.username)
-    if args.verbose:
-        print(f"Total tweets collected: {len(tweetslist)}")
-    # exit()
+    get_stats(tweetslist)
     userdatadict = get_user_data(args.username)
-    # tweetslist = get_content(args.username)
     if args.jsonout:
         with open('{}-tweets.json'.format(args.username), 'w+') as f:
             f.write(json.dumps(tweetslist, indent=4, sort_keys=True, default=str))
