@@ -1,11 +1,10 @@
-"""A script to grab twitter data."""
+"""A script to grab social media data data."""
 # !/usr/bin/python3
 # Author: James Campbell
 # License: Please see the license file in this repo
 # First Create Date: 28-Jan-2018
-# Last Update: 03-07-2019
+# Last Update: 03-09-2019
 # Requirements: minimal. check requirements.txt and run pip/pip3 install -f requirements.txt
-
 # imports section
 import argparse
 import json
@@ -14,7 +13,7 @@ import requests
 from beautifultable import BeautifulTable
 
 # globals
-__version__ = "1.2.1"
+__version__ = "1.2.2"
 OKBLUE = '\033[94m'
 ENDC = '\033[0m'
 logo = """
@@ -178,8 +177,12 @@ def get_tweets(username=args.username):
             tweetdict = dict()
             i = i + 1
             tweettext = item.find(class_='tweet-text')
-            tweetdict['tweettext'] = tweettext.text
-            tweetinfo = item.find('div', class_='tweet')
+            try:
+                tweetdict['tweettext'] = tweettext.text
+                tweetinfo = item.find('div', class_='tweet')
+            except:
+                tweetdict['tweettext'] = 'no tweet found'
+                continue
             if tweetinfo.has_attr('data-retweeter'):
                 tweetdict['type'] = 'retweet'
             else:
@@ -217,7 +220,7 @@ def get_stats(tweetslist):
     retweets, replies, favorites, rttype = [], [], [], []
     for item in tweetslist:
         if item['type'] == 'retweet':
-            rttype.append(v)
+            rttype.append(1)
             continue
         for k, v in item.items():
             if k == 'replies':
