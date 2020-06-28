@@ -1,11 +1,7 @@
 from setuptools import setup, find_packages
 import re
+from botrnot.__version__ import __version__
 
-version = re.search(
-    '^__version__\s*=\s*"(.*)"',
-    open('botrnot/botrnot.py').read(),
-    re.M
-).group(1)
 
 with open("README.md", "r") as f:
     long_descr = f.read()
@@ -14,7 +10,7 @@ setup(
     name='botrnot',
     author='James Campbell',
     author_email='james@jamescampbell.us',
-    version=version,
+    version=__version__,
     license='GPLv3',
     description='Evaluate if a twitter account is a bot or not',
     long_description=long_descr,
@@ -25,7 +21,9 @@ setup(
     install_requires=[
         'argparse',
         'beautifultable',
-        'requests'
+        'requests',
+        'twitter_scraper',
+        'beautifulsoup4'
     ],
     entry_points={
         'console_scripts': [

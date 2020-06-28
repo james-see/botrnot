@@ -3,7 +3,7 @@
 # Author: James Campbell
 # License: Please see the license file in this repo
 # First Create Date: 28-Jan-2018
-# Last Update: 03-09-2019
+# Last Update: 29-JUN-2020
 # Requirements: minimal. check requirements.txt and run pip/pip3 install -f requirements.txt
 # imports section
 import argparse
@@ -11,9 +11,13 @@ import json
 from bs4 import BeautifulSoup
 import requests
 from beautifultable import BeautifulTable
+from followers import get_followers
+try:
+    from __version__ import __version__
+except:
+    from findpi.__version__ import __version__
 
 # globals
-__version__ = "1.2.2"
 OKBLUE = '\033[94m'
 ENDC = '\033[0m'
 logo = """
@@ -43,10 +47,13 @@ PARSER.add_argument('-u', '--user', dest='username',
                     help='username to evaluate', default='jamescampbell', required=True)
 PARSER.add_argument('-n', '--no-logo', dest='nologo', action='store_true',
                     default=False, help='dont display logo (default False)')
-PARSER.add_argument('-v', '--verbose', dest='verbose', action='store_true',
+PARSER.add_argument('--verbose', dest='verbose', action='store_true',
                     default=False, help='print more things out about search')
 PARSER.add_argument('-j', '--json', dest='jsonout', action='store_true',
                     default=False, help='save tweets out to json file')
+PARSER.add_argument('-f', dest='getff', action='store_true',
+                    default=False, help='get followers and following data as well')
+PARSER.add_argument('-v', '--version', action='version', version=__version__)
 args = PARSER.parse_args()
 
 
@@ -253,6 +260,10 @@ def main():
     """Main function that runs everything."""
     if args.nologo is not True:
         print(logo)
+    if args.getff:
+        followerslist = get_followers(args.username)
+        print(followerslist)
+        # followinglist = get_following(args.username)
     tweetslist = get_tweets(args.username)
     get_stats(tweetslist)
     userdatadict = get_user_data(args.username)
@@ -262,6 +273,9 @@ def main():
                                sort_keys=True, default=str))
         with open('{}-profile.json'.format(args.username), 'w+') as f:
             f.write(json.dumps(userdatadict, indent=4,
+                               sort_keys=True, default=str))
+        with open('{}-followers.json'.format(args.username), 'w+') as f:
+            f.write(json.dumps(followerslist, indent=4,
                                sort_keys=True, default=str))
 
 

@@ -11,6 +11,7 @@ selenium = "*"
 twitter-scraper = "*"
 requests = "*"
 beautifulsoup4 = "*"
+beautifultable = "*"
 
 [requires]
 python_version = "3.7.7"
