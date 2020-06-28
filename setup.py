@@ -1,5 +1,4 @@
 from setuptools import setup, find_packages
-import re
 from botrnot.__version__ import __version__
 
 
@@ -14,6 +13,7 @@ setup(
     license='GPLv3',
     description='Evaluate if a twitter account is a bot or not',
     long_description=long_descr,
+    long_description_content_type="text/markdown",
     packages=['botrnot'],
     py_modules=['botrnot'],
     keywords=['bots', 'data-analysis', 'twitter', 'osint-research', 'osint'],
