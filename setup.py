@@ -32,5 +32,5 @@ setup(
     },
     url='https://github.com/jamesacampbell/botrnot',
     download_url='https://github.com/jamesacampbell/botrnot/archive/{}.tar.gz'.format(
-        version)
+        __version__)
 )
