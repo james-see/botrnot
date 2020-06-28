@@ -8,10 +8,9 @@
 # imports section
 import argparse
 import json
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup as bs
 import requests
 from beautifultable import BeautifulTable
-from followers import get_followers
 try:
     from __version__ import __version__
 except:
@@ -71,7 +70,7 @@ def get_user_data(username):
     }
     userdata = dict()
     r = requests.get(f'https://www.twitter.com/{username}', headers=headers)
-    soup = BeautifulSoup(r.text, 'html.parser')
+    soup = bs(r.text, 'html.parser')
     inputvalue = soup.find('input', class_='json-data')
     stringer = str(inputvalue)  # PITA twitter bs hidden value shit
     try:
@@ -167,7 +166,7 @@ def get_tweets(username=args.username):
         if pages == 25:
             jsondata = requests.get(url, headers=headers)
             actualjson = jsondata.json()
-            souppage = BeautifulSoup(actualjson['items_html'], 'html.parser')
+            souppage = bs(actualjson['items_html'], 'html.parser')
             tweets = souppage.find_all('li', class_='stream-item')
             try:
                 last_tweet = tweets[19]["data-item-id"]
@@ -177,7 +176,7 @@ def get_tweets(username=args.username):
             jsondata = requests.get(
                 url, params={'max_position': last_tweet}, headers=headers)
             actualjson = jsondata.json()
-            souppage = BeautifulSoup(actualjson['items_html'], 'html.parser')
+            souppage = bs(actualjson['items_html'], 'html.parser')
             tweets = souppage.find_all('li', class_='stream-item')
         i = 0
         for item in tweets:
@@ -253,17 +252,161 @@ def get_stats(tweetslist):
             print("\nMetrics table")
             print(t)
 
+
+# get following
+
+
+def get_following(username):
+    global followingdict
+    headers = {
+        'Accept': 'application/json, text/javascript, */*; q=0.01',
+        'Referer': f'https://twitter.com/{username}',
+        'User-Agent': 'Opera/9.80 (J2ME/MIDP; Opera Mini/5.1.21214/28.2725; U; ru) Presto/2.8.119 Version/11.10',
+        'X-Twitter-Active-User': 'yes',
+        'X-Requested-With': 'XMLHttpRequest'
+    }
+    followerpage_base = requests.get(
+        f'https://mobile.twitter.com/{username}/following?cursor=-1&count=200', headers=headers
+        )
+    # print(followerpage_base.text)
+    soup = bs(followerpage_base.text, 'html.parser')
+    users = soup.find_all('td', {'class': 'screenname'})
+    for u in users:
+        # print(u.text.strip())
+        # print(u.find('a')['name'].strip())
+        followingdict[u.find('a')['name'].strip()] = u.text.strip()
+    if soup.find('div',{'class':'w-button-more'}):
+        urlsnip = soup.find('div',{'class':'w-button-more'}).find('a')['href']
+        return urlsnip
+    else:
+        return 0
+        #users_data = get_more(urlsnip, users_data, username)
+
+
+def get_more_following(urlsnip, username):
+    global followingdict
+    headers = {
+        'Accept': 'application/json, text/javascript, */*; q=0.01',
+        'User-Agent': 'Opera/9.80 (J2ME/MIDP; Opera Mini/5.1.21214/28.2725; U; ru) Presto/2.8.119 Version/11.10',
+        'X-Twitter-Active-User': 'yes',
+        'X-Requested-With': 'XMLHttpRequest'
+    }
+    updateddata = requests.get(f"https://mobile.twitter.com{urlsnip}&count=200", headers=headers)
+    soup = bs(updateddata.text, 'html.parser')
+    users = soup.find_all('td', {'class': 'screenname'})
+    # print(len(users))
+    if len(users) > 0:
+        for u in users:
+            followingdict[u.find('a')['name'].strip()] = u.text.strip()
+    if soup.find('div',{'class':'w-button-more'}):
+        urlsnip = soup.find('div',{'class':'w-button-more'}).find('a')['href']
+        get_more_following(urlsnip, username)
+
+
+# get followers
+
+
+def get_followers(username):
+    global followersdict
+    headers = {
+        'Accept': 'application/json, text/javascript, */*; q=0.01',
+        'Referer': f'https://twitter.com/{username}',
+        'User-Agent': 'Opera/9.80 (J2ME/MIDP; Opera Mini/5.1.21214/28.2725; U; ru) Presto/2.8.119 Version/11.10',
+        'X-Twitter-Active-User': 'yes',
+        'X-Requested-With': 'XMLHttpRequest'
+    }
+    followerpage_base = requests.get(
+        f'https://mobile.twitter.com/{username}/followers?cursor=-1&count=200', headers=headers
+        )
+    # print(followerpage_base.text)
+    soup = bs(followerpage_base.text, 'html.parser')
+    users = soup.find_all('td', {'class': 'screenname'})
+    for u in users:
+        # print(u.text.strip())
+        # print(u.find('a')['name'].strip())
+        followersdict[u.find('a')['name'].strip()] = u.text.strip()
+    if soup.find('div',{'class':'w-button-more'}):
+        urlsnip = soup.find('div',{'class':'w-button-more'}).find('a')['href']
+        return urlsnip
+    else:
+        return 0
+        #users_data = get_more(urlsnip, users_data, username)
+
+
+def get_more_followers(urlsnip, username):
+    global followersdict
+    headers = {
+        'Accept': 'application/json, text/javascript, */*; q=0.01',
+        'User-Agent': 'Opera/9.80 (J2ME/MIDP; Opera Mini/5.1.21214/28.2725; U; ru) Presto/2.8.119 Version/11.10',
+        'X-Twitter-Active-User': 'yes',
+        'X-Requested-With': 'XMLHttpRequest'
+    }
+    updateddata = requests.get(f"https://mobile.twitter.com{urlsnip}&count=200", headers=headers)
+    soup = bs(updateddata.text, 'html.parser')
+    users = soup.find_all('td', {'class': 'screenname'})
+    # print(len(users))
+    if len(users) > 0:
+        for u in users:
+            followersdict[u.find('a')['name'].strip()] = u.text.strip()
+    if soup.find('div',{'class':'w-button-more'}):
+        urlsnip = soup.find('div',{'class':'w-button-more'}).find('a')['href']
+        get_more_followers(urlsnip, username)
+
+
 # main section
 
+followingdict = dict()
+followersdict = dict()
 
 def main():
     """Main function that runs everything."""
     if args.nologo is not True:
         print(logo)
     if args.getff:
-        followerslist = get_followers(args.username)
-        print(followerslist)
-        # followinglist = get_following(args.username)
+        global followingdict
+        urlsnip = get_following(args.username)
+        if urlsnip == 0:
+            if args.verbose:
+                t = BeautifulTable()
+                t.column_headers = ["Username", "Full Name"]
+                for k,v in followingdict.items():        
+                    t.append_row([f"{k}",
+                                f"{OKBLUE}{v}{ENDC}"])
+                print("\nFollowing table")
+                print(t)
+        else:
+            get_more_following(urlsnip,args.username)
+            if args.verbose:
+                t = BeautifulTable()
+                t.column_headers = ["Username", "Full Name"]
+                for k,v in followingdict.items():        
+                    t.append_row([f"{k}",
+                                f"{OKBLUE}{v}{ENDC}"])
+                print("\nFollowing table")
+                print(t)
+        global followersdict
+        urlsnip = get_followers(args.username)
+        if urlsnip == 0:
+            if args.verbose:
+                t = BeautifulTable()
+                t.column_headers = ["Username", "Full Name"]
+                for k,v in followersdict.items():        
+                    t.append_row([f"{k}",
+                                f"{OKBLUE}{v}{ENDC}"])
+                print("\nFollowing table")
+                print(t)
+        else:
+            get_more_followers(urlsnip,args.username)
+            if args.verbose:
+                t = BeautifulTable()
+                t.column_headers = ["Username", "Full Name"]
+                for k,v in followersdict.items():        
+                    t.append_row([f"{k}",
+                                f"{OKBLUE}{v}{ENDC}"])
+                print("\nFollowers table")
+                print(t)
+
+
     tweetslist = get_tweets(args.username)
     get_stats(tweetslist)
     userdatadict = get_user_data(args.username)
@@ -274,10 +417,12 @@ def main():
         with open('{}-profile.json'.format(args.username), 'w+') as f:
             f.write(json.dumps(userdatadict, indent=4,
                                sort_keys=True, default=str))
-        with open('{}-followers.json'.format(args.username), 'w+') as f:
-            f.write(json.dumps(followerslist, indent=4,
+        with open('{}-following.json'.format(args.username), 'w+') as f:
+            f.write(json.dumps(followingdict, indent=4,
                                sort_keys=True, default=str))
-
+        with open('{}-followers.json'.format(args.username), 'w+') as f:
+            f.write(json.dumps(followersdict, indent=4,
+                               sort_keys=True, default=str))
 
 if __name__ == "__main__":
     main()
