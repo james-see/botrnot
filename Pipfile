@@ -12,6 +12,7 @@ twitter-scraper = "*"
 requests = "*"
 beautifulsoup4 = "*"
 beautifultable = "*"
+urllib3 = ">=1.26.5"
 
 [requires]
 python_version = "3.7.7"
