@@ -1,5 +1,5 @@
 requests==2.21.0
 twitter_scraper==0.3.0
-setuptools==40.8.0
+setuptools==65.5.1
 beautifulsoup4==4.7.1
 beautifultable
